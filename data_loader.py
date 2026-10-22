@@ -1,8 +1,12 @@
+import streamlit as st
 import pandas as pd
 
+@st.cache_data
 def load_data():
-    file_path = "FPR_Database.xlsx"
-    df = pd.read_excel(file_path)
+    # Point to your local OneDrive sync folder
+    df = pd.read_excel(
+        r"C:\Users\NMoniz\OneDrive - SLB\Desktop\FPR_analysis_app"
+    )
 
     # Clean column names
     df.columns = [str(col).strip().upper() for col in df.columns]

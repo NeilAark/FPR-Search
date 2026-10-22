@@ -1,39 +1,27 @@
 import pandas as pd
 
-def load_data(filepath='FPR_Database.xlsx'):
-    df = pd.read_excel(filepath, sheet_name='fpr_nmoniz')
-    
-    # Key columns we care about for search & display
-    key_columns = [
-        'FPR Number',
-        'Assembly Part Number',
-        'Defective Part Number',
-        'Defective Part Number Description',
-        'Serial Number',
-        'Failure Description',
-        'Cause Assessment',
-        'Root Cause Category',
-        'Corrective Action',
-        'Follow-Up Action',
-        'Status',
-        'Incident Date',
-        'Date Closed',
-        'Customer',
-        'Project',
-        'Rig',
-        'Division',
-        'Segment',
-        'Loss Category',
-        'Dollar Loss',
-        'Non Productive Time'
-    ]
-    
-    # Keep only columns that exist in the file
-    available_columns = [col for col in key_columns if col in df.columns]
-    df = df[available_columns]
-    
-    # Drop rows with no failure description (essential for search)
-    df = df.dropna(subset=['Failure Description'])
-    df = df.fillna('Unknown')
-    
+def load_data():
+    file_path = "FPR_Database.xlsx"
+    df = pd.read_excel(file_path)
+
+    # Clean column names
+    df.columns = [str(col).strip().upper() for col in df.columns]
+
+    # Fix duplicate column names
+    counts = {}
+    new_cols = []
+    for col in df.columns:
+        if col in counts:
+            counts[col] += 1
+            new_cols.append(f"{col}_{counts[col]}")
+        else:
+            counts[col] = 1
+            new_cols.append(col)
+    df.columns = new_cols
+
+    # Convert the key columns to clean strings
+    for col in ["SERIAL NUMBER", "DEFECTIVE PART NUMBER", "ASSEMBLY PART NUMBER", "FAILURE DESCRIPTION", "FPR NUMBER", "INVESTIGATION DETAILS"]:
+        if col in df.columns:
+            df[col] = df[col].astype(str).str.strip().str.upper()
+
     return df
